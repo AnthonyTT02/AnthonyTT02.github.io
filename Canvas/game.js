@@ -5,6 +5,7 @@ const KEYS = {
 };
 
 let game = {
+    running: true,
     ctx: null,
     platform: null,
     ball: null,
@@ -85,11 +86,13 @@ let game = {
         }
     },
     run() {
-        window.requestAnimationFrame(() => {
-            this.update();
-            this.render();
-            this.run();
-        });
+        if(this.running) {
+            window.requestAnimationFrame(() => {
+                this.update();
+                this.render();
+                this.run();
+            });
+        }
     },
     render() {
         this.ctx.clearRect(0, 0, this.width, this.height);
@@ -153,7 +156,7 @@ game.ball = {
     },
     collideWorldBounds() {
         let x = this.x + this.dx;
-        let y = this.y = this.dy;
+        let y = this.y + this.dy;
 
         let ballLeft = x;
         let ballRight = ballLeft + this.width;
@@ -175,7 +178,9 @@ game.ball = {
             this.y = 0;
             this.dy = this.velocity;
         } else if (ballBottom > worldBottom) {
-            console.log('game over');
+            game.running = false;
+            alert("You loose!");
+            window.location.reload();
         }
     },
     bumpBlock(block) {
