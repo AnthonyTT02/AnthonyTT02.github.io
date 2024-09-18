@@ -14,14 +14,14 @@ html{
 }
 
 .container{
-	min-height: 400px;
+	min-height: 300px;
 	background: url('img/me.jpg') center/cover no-repeat;
 
 }
 
 .my_projects {
 	display: block;
-	left: 50px;
+	left: 40px;
 }
 
 .my_projects a{
