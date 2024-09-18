@@ -170,6 +170,15 @@ game.ball = {
     start() {
         this.dy = -this.velocity;
         this.dx = game.random(-this.velocity, this.velocity);
+        this.animate();
+    },
+    animate() {
+        setInterval(() => {
+            ++this.frame;
+            if (this.frame > 3) {
+                this.frame = 0;
+            }
+        }, 100);
     },
     move() {
         if (this.dy) {
