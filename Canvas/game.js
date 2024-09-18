@@ -21,7 +21,10 @@ let game = {
         platform: null,
         block: null
     },
-    init: function() {
+    sounds: {
+        bump: null,
+    },
+    init() {
         this.ctx = document.getElementById("mycanvas").getContext("2d");
         this.setEvents();
     },
@@ -40,17 +43,29 @@ let game = {
     preload(callback) {
         let loaded = 0;
         let required = Object.keys(this.sprites).length;
-        let onImageLoad = () => {
+        required += Object.keys(this.sounds).length;
+        
+        let onResourceLoad = () => {
             ++loaded;
             if (loaded >= required) {
                 callback();
             }
         };
-        
+
+        this.preloadSprites(onResourceLoad);
+        this.preloadAudio(onResourceLoad);
+    },
+    preloadSprites(onResourceLoad) {
         for (let key in this.sprites) {
             this.sprites[key] = new Image();
             this.sprites[key].src = "img/" + key + ".png";
-            this.sprites[key].addEventListener("load", onImageLoad)
+            this.sprites[key].addEventListener("load", onResourceLoad)
+        }
+    },
+    preloadAudio(onResourceLoad) {
+        for (let key in this.sounds) {
+            this.sounds[key] = new Audio("sounds/" + key + ".mp3");
+            this.sounds[key].addEventListener("canplaythrough", onResourceLoad, {once: true});
         }
     },
     create() {
@@ -86,16 +101,18 @@ let game = {
             if (block.active && this.ball.collide(block)) {
                 this.ball.bumpBlock(block);
                 this.addScore();
+                this.sounds.bump.play();
             }
         }
     },
     collidePlatform() {
         if (this.ball.collide(this.platform)) {
             this.ball.bumpPlatform(this.platform);
+            this.sounds.bump.play();
         }
     },
     run() {
-        if(this.running) {
+        if (this.running) {
             window.requestAnimationFrame(() => {
                 this.update();
                 this.render();
@@ -185,16 +202,17 @@ game.ball = {
         if (ballLeft < worldLeft) {
             this.x = 0;
             this.dx = this.velocity;
+            game.sounds.bump.play();
         } else if (ballRight > worldRight) {
             this.x = worldRight - this.width;
             this.dx = -this.velocity;
-        } else if(ballTop< worldTop) {
+            game.sounds.bump.play();
+        } else if(ballTop < worldTop) {
             this.y = 0;
             this.dy = this.velocity;
+            game.sounds.bump.play();
         } else if (ballBottom > worldBottom) {
-            game.running = false;
-            alert("You loose!");
-            window.location.reload();
+            game.end("You loose!");
         }
     },
     bumpBlock(block) {
